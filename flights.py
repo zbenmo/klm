@@ -20,22 +20,6 @@ class Booking:
         return f'Passenger name: {self.passenger_name}, departure: {self.departure}, itenerary: "{itenerary_nice}"'
 
 
-def sublist_in_list(sublist: List, test_list: List) -> bool:
-    """
-    Helper function to check a sublist is in a test list or not (used below in select_bookings_by_sequential_airports_couple).
-
-    >>> sublist_in_list([1, 2], [4, 1, 2])
-    True
-    >>> sublist_in_list([1, 2], [4, 2, 1])
-    False
-    >>> sublist_in_list([1, 2], [1, 4, 2])
-    False
-    """
-
-    return any(test_list[idx : idx + len(sublist)] == sublist
-        for idx in range(len(test_list) - len(sublist) + 1))
-
-
 class FlightsSchedule:
     pass
 
@@ -96,7 +80,9 @@ def test1():
     1
     Passenger name: Alice, departure: 2020-05-26 06:45:00, itenerary: "LHR->AMS"
     2
-    Passenger name: Alice, departure: 2020-05-26 06:45:00, itenerary: "LHR->AMS"
+    Passenger name: Bruce, departure: 2020-06-04 11:04:00, itenerary: "GVA->AMS->LHR"
+    Passenger name: Cindy, departure: 2020-06-06 10:00:00, itenerary: "AAL->AMS->LHR->JFK->SFO"
+    Passenger name: Derek, departure: 2020-06-12 08:09:00, itenerary: "AMS->LHR"
     3
     Passenger name: Alice, departure: 2020-05-26 06:45:00, itenerary: "LHR->AMS"
     Passenger name: Bruce, departure: 2020-06-04 11:04:00, itenerary: "GVA->AMS->LHR"
@@ -123,7 +109,7 @@ def test1():
         print(booking)
 
     print(2)
-    for booking in flights_schedule.select_bookings_by_sequential_airports_couple("LHR", "AMS"):
+    for booking in flights_schedule.select_bookings_by_sequential_airports_couple("AMS", "LHR"):
         print(booking)
 
     print(3)
