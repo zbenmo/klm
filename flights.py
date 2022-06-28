@@ -42,7 +42,6 @@ class FlightsSchedule:
 
         self.bookings.append(booking)
         self.register_sequential_airport_couples(booking)
-
         return self
 
     def register_sequential_airport_couples(self, booking:Booking):
