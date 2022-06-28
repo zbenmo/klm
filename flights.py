@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Generator
 from doctest import testmod
-import heapq
 from collections import defaultdict
 
 
@@ -31,7 +30,7 @@ class FlightsSchedule:
     and assumes not a very long itenerary. 
     """
     def __init__(self):
-        self.bookings = [] # it will be a heap with pairs (departure, the actual booking)
+        self.bookings = []
         self.airport_sequence_dict = defaultdict(list)
 
     def add_booking(self, booking:Booking) -> FlightsSchedule:
@@ -41,28 +40,30 @@ class FlightsSchedule:
         # assumption it shouldn't happen. Iteneraries are not longer than 9.
         assert f"received itenerary with length {len(booking.itenerary)}", len(booking.itenerary) < 10
 
-        heapq.heappush(self.bookings, (booking.departure, booking))
+        self.bookings.append(booking)
         self.register_sequential_airport_couples(booking)
 
         return self
 
     def register_sequential_airport_couples(self, booking:Booking):
+        seen = set()
         for airport1, airport2 in zip(booking.itenerary[:-1], booking.itenerary[1:]):
-            self.airport_sequence_dict[(airport1, airport2)].append(booking)    
+            pair = (airport1, airport2)
+            assert pair not in seen # just to verify assumption of no duplications
+            seen.add(pair)
+            self.airport_sequence_dict[pair].append(booking)    
 
     def select_bookings_by_latest_departure_time(self, departs_before:datetime) -> Generator[FlightsSchedule, None, None]:
         "Assumes the departs_before as UTC."
+        "Linear time with respect to number of bookings"
 
-        for departure, booking in self.bookings:
-            if departure < departs_before:
-                yield booking
-            else:
-                return
+        yield from (booking for booking in self.bookings if booking.departure < departs_before)
 
     def select_bookings_by_sequential_airports_couple(self, airport1:str, airport2:str) -> Generator[FlightsSchedule, None, None]:
         "Assumes airport1 and airport2 are IATA codes."
 
-        yield from self.airport_sequence_dict[(airport1, airport2)]
+        pair = (airport1, airport2)
+        yield from self.airport_sequence_dict[pair]
 
 
 def date_from_string(input_str: str) -> datetime:
